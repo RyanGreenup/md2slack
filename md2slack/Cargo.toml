@@ -1,0 +1,9 @@
+[package]
+name = "md2slack"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+comrak = "0.56.0"
+markdown-rs = "0.1.0"
+pulldown-cmark = "0.13.4"
