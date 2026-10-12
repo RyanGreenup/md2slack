@@ -1,3 +1,4 @@
+use anyhow::{Context, Result, bail};
 use clap::{ArgGroup, Parser};
 use std::fs;
 use std::io::{self, Read, Write};
@@ -29,46 +30,49 @@ struct Args {
     copy: bool,
 }
 
-// TODO use anyhow
-fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
+fn run(args: Args) -> Result<()> {
     let markdown = if args.paste {
         let output = Command::new("wl-paste")
             .args(["--no-newline", "--type", "text"])
-            .output()?;
+            .output()
+            .context("running wl-paste")?;
         if !output.status.success() {
-            return Err(format!(
+            bail!(
                 "wl-paste exited with {}: {}",
                 output.status,
                 String::from_utf8_lossy(&output.stderr).trim()
-            )
-            .into());
+            );
         }
-        String::from_utf8(output.stdout)?
+        String::from_utf8(output.stdout).context("clipboard text is not valid UTF-8")?
     } else if let Some(path) = args.file.filter(|path| path.as_os_str() != "-") {
-        fs::read_to_string(path)?
+        fs::read_to_string(&path)
+            .with_context(|| format!("reading Markdown from {}", path.display()))?
     } else {
         let mut text = String::new();
-        io::stdin().read_to_string(&mut text)?;
+        io::stdin()
+            .read_to_string(&mut text)
+            .context("reading Markdown from stdin")?;
         text
     };
     let html = md2slack::to_html(&markdown)?;
     if let Some(path) = args.output {
-        fs::write(path, html)?;
+        fs::write(&path, html).with_context(|| format!("writing HTML to {}", path.display()))?;
     } else {
         let mut child = Command::new("wl-copy")
             .args(["--type", "text/html"])
             .stdin(Stdio::piped())
-            .spawn()?;
+            .spawn()
+            .context("running wl-copy")?;
         let result = child
             .stdin
             .take()
             .expect("piped stdin")
             .write_all(html.as_bytes());
-        let status = child.wait()?;
+        let status = child.wait().context("waiting for wl-copy")?;
         if !status.success() {
-            return Err(format!("wl-copy exited with {status}").into());
+            bail!("wl-copy exited with {status}");
         }
-        result?;
+        result.context("writing HTML to wl-copy")?;
     }
     Ok(())
 }
@@ -77,7 +81,7 @@ fn main() -> ExitCode {
     match run(Args::parse()) {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("md2slack: {error}");
+            eprintln!("md2slack: {error:#}");
             ExitCode::FAILURE
         }
     }

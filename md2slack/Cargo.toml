@@ -5,3 +5,4 @@ edition.workspace = true
 
 [dependencies]
 tempfile = "3"
+thiserror = "2"
