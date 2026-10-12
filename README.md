@@ -12,8 +12,11 @@ This is for anyone who wants to write a reply in vim and just paste it in.
 You'll need `rust` to compile it.
 
 > [!NOTE]
-> Currently, clipboard operations require a Wayland session and `wl-clipboard`
-> (`wl-paste` and `wl-copy`).
+> Clipboard operations use the built-in `wl-clipboard-rs` crate and require a
+> Wayland session with data-control support.
+
+`--copy` starts a background instance of the same binary to serve `text/html`
+after the command exits. It stops when the clipboard selection is replaced.
 
 ## Instructions for using Markdown 2 Slack
 
@@ -38,13 +41,13 @@ You'll need `rust` to compile it.
 
    Options:
          --stdin          Read Markdown from stdin (default when no input is specified)
-         --paste          Read Markdown text from the Wayland clipboard using wl-paste
+         --paste          Read Markdown text from the Wayland clipboard
      -o, --output <FILE>  Write HTML to a file
-         --copy           Copy HTML to the Wayland clipboard using wl-copy
+         --copy           Copy HTML to the Wayland clipboard
      -h, --help           Print help
      -V, --version        Print version
 
-   Markdown conversion is built in. Clipboard operations require a Wayland session and wl-clipboard.
+   Clipboard access is built in and requires a Wayland session with data-control support.
 
    Examples:
      md2slack notes.md -o notes.html
