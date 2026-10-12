@@ -10,7 +10,7 @@ use std::process::{Command, ExitCode, Stdio};
 #[command(version, group(ArgGroup::new("input").args(["file", "stdin", "paste"]).multiple(false)))]
 #[command(group(ArgGroup::new("destination").args(["output", "copy"]).required(true).multiple(false)))]
 #[command(
-    after_help = "Requires pandoc on PATH. Clipboard operations require a Wayland session and wl-clipboard.\n\nExamples:\n  md2slack notes.md -o notes.html\n  cat notes.md | md2slack --copy\n  md2slack --paste -o notes.html\n  md2slack --paste --copy\n\nHTML is a fragment for rich-text pasting, not Slack mrkdwn. Raw HTML in the input is preserved by Pandoc."
+    after_help = "Clipboard operations require a Wayland session and wl-clipboard.\n\nExamples:\n  md2slack notes.md -o notes.html\n  cat notes.md | md2slack --copy\n  md2slack --paste -o notes.html\n  md2slack --paste --copy\n\nHTML is a fragment for rich-text pasting, not Slack mrkdwn. Raw HTML in the input is preserved."
 )]
 struct Args {
     /// Read Markdown from a file (use - for stdin).
@@ -54,7 +54,7 @@ fn run(args: Args) -> Result<()> {
             .context("reading Markdown from stdin")?;
         text
     };
-    let html = md2slack::to_html(&markdown)?;
+    let html = md2slack::to_html(&markdown);
     if let Some(path) = args.output {
         fs::write(&path, html).with_context(|| format!("writing HTML to {}", path.display()))?;
     } else {

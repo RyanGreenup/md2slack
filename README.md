@@ -11,14 +11,18 @@ This is for anyone who wants to write a reply in vim and just paste it in.
 
 You'll need `rust` to compile it.
 
+> [!NOTE]
+> Currently, clipboard operations require a Wayland session and `wl-clipboard`
+> (`wl-paste` and `wl-copy`).
+
 ## Instructions for using Markdown 2 Slack
 
 1. Install it
    ```sh
    cd ~/Downloads/
-   git clone https://github.com/https://github.com/ryangreenup/md2slack.git
+   git clone https://github.com/ryangreenup/md2slack.git
    cd md2slack
-   cargo install --path .
+   cargo install --path cli
    ```
 2. Run it
    ```sh
@@ -40,7 +44,7 @@ You'll need `rust` to compile it.
      -h, --help           Print help
      -V, --version        Print version
 
-   Requires pandoc on PATH. Clipboard operations require a Wayland session and wl-clipboard.
+   Markdown conversion is built in. Clipboard operations require a Wayland session and wl-clipboard.
 
    Examples:
      md2slack notes.md -o notes.html
@@ -48,7 +52,7 @@ You'll need `rust` to compile it.
      md2slack --paste -o notes.html
      md2slack --paste --copy
 
-   HTML is a fragment for rich-text pasting, not Slack mrkdwn. Raw HTML in the input is preserved by Pandoc.
+   HTML is a fragment for rich-text pasting, not Slack mrkdwn. Raw HTML in the input is preserved.
    ```
 
 ## Contributing guidelines

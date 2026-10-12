@@ -4,5 +4,4 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-tempfile = "3"
-thiserror = "2"
+pulldown-cmark = "0.13.4"
